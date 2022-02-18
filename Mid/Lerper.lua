@@ -1,5 +1,6 @@
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+
 local function AccToAlpha(Object)
     return Object.Acc / Object.Time
 end
@@ -29,23 +30,35 @@ end
 function Iterator.Cycle(Object, Value)
     local Idx = table.find(Object.Range, Object.End)
     if Idx == #Object.Range then
-        if Object.DestroyOnCompletion then
-            Object.IsRunning = false
+        if Object.DisableOnCompletion then
+            Object:TurnOn(false)
         end
         return Object.Range[1]
     end
     return Object.Range[Idx + 1]
 end
+local Running = {
+    [true] = {},
+    [false] = {}
+}
+local Meta = {}
+Meta.__index = Meta
 
-local Objects = {}
+function Meta:SetRunning(Bool)
+    self.IsRunning = Bool
+    Running[Bool] = self
+    Running[not Bool] = nil
+    if not Bool and self.ResetOnDisable then
+        self.Parent[self.Child] = self.Range[1]
+    end
+    return self
+end
+function Meta:Destroy()
+    self:SetRunning(false)
+    Running[self.IsRunning][self.Tag] = nil
+end
 local Lerper = {}
-function Lerper.GetObject(Tag)
-    return Objects[Tag]
-end
-function Lerper.RemoveObject(Tag)
-    Lerper.GetObject(Tag).IsRunning = false
-end
-function Lerper.AddTag(Tag, Object)
+function Lerper.new(Tag, Object)
     Object.Start = Object.Range[1]
     Object.End = Object.Range[2]
     Object.Acc = 0
@@ -58,25 +71,20 @@ function Lerper.AddTag(Tag, Object)
     end
     Object.IterType = Iterator[Object.IterType]
     Object.Tag = Tag
-    Objects[Tag] = Object
-    return Object
+    return setmetatable(Object, Meta)
+end
+function Lerper.GetObject(Tag) -- GLOBAL_ACCESS
+    return Running.On[Tag] or Running.Off[Tag]
 end
 RunService.Heartbeat:Connect(function(Dt)
-    for _, Object in pairs(Objects) do
+    for _, Object in pairs(Running.On) do
         Object.Acc = Object.Acc + Dt
-        if Object.IsRunning then
-            if Object.Acc >= Object.Time then
-                Object.Start = Object.End
-                Object.End = Object.IterType(Object)
-                Object.Acc = 0
-            end
-            SafeLerp(Object)
-        else
-            if Object.ResetOnDestroy then
-                Object.Parent[Object.Child] = Object.Range[1]
-            end
-            Objects[Object.Tag] = nil
+        if Object.Acc >= Object.Time then
+            Object.Start = Object.End
+            Object.End = Object.IterType(Object)
+            Object.Acc = 0
         end
+        SafeLerp(Object)
     end
 end)
 return Lerper
@@ -88,8 +96,8 @@ Object:
         Direction = Enum.EasingDirection[...]
         Time = ...: Number
         IterType: ...: String
-        ResetOnDestroy = ...: Boolean (OPTIONAL)
+        ResetOnDestroy = ...: Boolean (RESET_ON_DESTROY <-> PARENT)
         Child = ...: String (CHILD <-> Parent)
-        Parent = ...: Instance (CHILD <-> Parent)
+        Parent = ...: Instance | Object
     }
 --]]
