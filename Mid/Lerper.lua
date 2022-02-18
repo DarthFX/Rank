@@ -63,7 +63,6 @@ function Lerper.new(Tag, Object)
     Object.End = Object.Range[2]
     Object.Acc = 0
     Object.IsNumber = type(Object.Start) == "number"
-    Object.IsRunning = true
     Object.Parent = Object.Parent or Object
     Object.Child = Object.Child or "Result"
     if Object.IterType == "Reverse" then
@@ -97,6 +96,7 @@ Object:
         Time = ...: Number
         IterType: ...: String
         ResetOnDisable = ...: Boolean
+        DisableOnCompletion = ...: Boolean
         Child = ...: String (CHILD <-> Parent)
         Parent = ...: Instance | Object
     }
