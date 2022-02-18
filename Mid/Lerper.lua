@@ -77,7 +77,7 @@ function Lerper.GetObject(Tag) -- GLOBAL_ACCESS
     return Running.On[Tag] or Running.Off[Tag]
 end
 RunService.Heartbeat:Connect(function(Dt)
-    for _, Object in pairs(Running.On) do
+    for _, Object in pairs(Running[true]) do
         Object.Acc = Object.Acc + Dt
         if Object.Acc >= Object.Time then
             Object.Start = Object.End
