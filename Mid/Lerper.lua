@@ -47,8 +47,8 @@ Meta.__index = Meta
 
 function Meta:SetRunning(Bool)
     self.IsRunning = Bool
-    Running[Bool] = self
-    Running[not Bool] = nil
+    Running[Bool][self.Tag] = self
+    Running[not Bool][self.Tag] = nil
     if not Bool and self.ResetOnDisable then
         self.Parent[self.Child] = self.Range[1]
     end
@@ -56,7 +56,7 @@ function Meta:SetRunning(Bool)
 end
 function Meta:Destroy()
     self:SetRunning(false)
-    Running[false] = nil
+    Running[false][self.Tag] = nil
 end
 local Lerper = {}
 function Lerper.new(Tag, Object, Recycle) -- Recycle creates an instance of Object as if Object was a Class
