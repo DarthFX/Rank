@@ -96,7 +96,7 @@ Object:
         Direction = Enum.EasingDirection[...]
         Time = ...: Number
         IterType: ...: String
-        ResetOnDestroy = ...: Boolean (RESET_ON_DESTROY <-> PARENT)
+        ResetOnDisable = ...: Boolean
         Child = ...: String (CHILD <-> Parent)
         Parent = ...: Instance | Object
     }
