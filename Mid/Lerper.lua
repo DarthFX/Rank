@@ -56,6 +56,7 @@ function Lerper.AddTag(Tag, Object)
     if Object.IterType == "Reverse" then
         Object.EndDirection = 1
     end
+    Object.IterType = Iterator[Object.IterType]
     Object.Tag = Tag
     Objects[Tag] = Object
     return Object
@@ -66,7 +67,7 @@ RunService.Heartbeat:Connect(function(Dt)
         if Object.IsRunning then
             if Object.Acc >= Object.Time then
                 Object.Start = Object.End
-                Object.End = Iterator[Object.IterType](Object)
+                Object.End = Object.IterType(Object)
                 Object.Acc = 0
             end
             SafeLerp(Object)
