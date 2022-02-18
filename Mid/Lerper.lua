@@ -6,25 +6,25 @@ end
 local function LinearInterpolate(A, B, T)
     return A + (B - A) * T
 end
-local function SafeLerp(Object)
-    local Percent = TweenService:GetValue(AccToAlpha(Object), Object.Style, Object.Direction)
-    if Object.IsNumber then
-        Object.Parent[Object.Child] = LinearInterpolate(Object.Start, Object.End, Percent)
+local function SafeLerp(Property)
+    local Percent = TweenService:GetValue(AccToAlpha(Property), Property.Style, Property.Direction)
+    if Property.IsNumber then
+        Property.Parent[Property.Child] = LinearInterpolate(Property.Start, Property.End, Percent)
     else
-        Object.Parent[Object.Child] = Object.Start:Lerp(Object.End, Percent)
+        Property.Parent[Property.Child] = Property.Start:Lerp(Property.End, Percent)
     end
 end
 local Iterator = {}
-function Iterator.Reverse(Object)
-    local Idx = table.find(Object.Range, Object.End)
-    if Idx == #Object.Range then
-        Object.EndDirection = -1
-        return Object.Range[Idx - 1]
+function Iterator.Reverse(Property)
+    local Idx = table.find(Property.Range, Property.End)
+    if Idx == #Property.Range then
+        Property.EndDirection = -1
+        return Property.Range[Idx - 1]
     elseif Idx == 1 then
-        Object.EndDirection = 1
-        return Object.Range[2]
+        Property.EndDirection = 1
+        return Property.Range[2]
     end
-    return Object.Range[Idx + Object.EndDirection]
+    return Property.Range[Idx + Property.EndDirection]
 end
 function Iterator.Cycle(Object, Value)
     local Idx = table.find(Object.Range, Object.End)
@@ -43,17 +43,19 @@ function Lerper.RemoveObject(Tag)
     Lerper.GetObject(Tag).IsRunning = false
 end
 function Lerper.AddTag(Tag, Object)
-    Object.Start = Object.Range[1]
-    Object.End = Object.Range[2]
-    Object.Acc = 0
-    Object.IsNumber = type(Object.Start) == "number"
-    Object.IsRunning = true
-    Object.Parent = Object.Parent or Object
-    Object.Child = Object.Child or "Result"
-    if Object.IterType == "Reverse" then
-        Object.EndDirection = 1
+    for _, Property in pairs(Object) do
+        Property.Start = Property[1]
+        Property.End = Property[2]
+        Property.Acc = 0
+        Property.IsNumber = type(Object.Start) == "number"
+        Property.IsRunning = true
+        Property.Parent = Property.Parent or Property
+        Property.Child = Property.Child or "Result"
+        if Property.IterType == "Reverse" then
+            Property.EndDirection = 1
+        end
+        Property.IterType = Iterator[Property.IterType]
     end
-    Object.IterType = Iterator[Object.IterType]
     Object.Tag = Tag
     Objects[Tag] = Object
     return Object
@@ -62,12 +64,14 @@ RunService.Heartbeat:Connect(function(Dt)
     for _, Object in pairs(Objects) do
         Object.Acc = Object.Acc + Dt
         if Object.IsRunning then
-            if Object.Acc >= Object.Time then
-                Object.Start = Object.End
-                Object.End = Object.IterType(Object)
-                Object.Acc = 0
+            for _, Property in pairs(Object.Properties) do
+                if Property.Acc >= Property.Time then
+                    Property.Start = Property.End
+                    Property.End = Property.IterType(Property)
+                    Property.Acc = 0
+                end
+                SafeLerp(Property)
             end
-            SafeLerp(Object)
         else
             if Object.ResetOnDestroy then
                 Object.Parent[Object.Child] = Object.Range[1]
