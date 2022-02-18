@@ -29,6 +29,9 @@ end
 function Iterator.Cycle(Object, Value)
     local Idx = table.find(Object.Range, Object.End)
     if Idx == #Object.Range then
+        if Object.DestroyOnCompletion then
+            Object.IsRunning = false
+        end
         return Object.Range[1]
     end
     return Object.Range[Idx + 1]
