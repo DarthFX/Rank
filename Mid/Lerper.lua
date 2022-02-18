@@ -55,7 +55,7 @@ function Meta:SetRunning(Bool)
 end
 function Meta:Destroy()
     self:SetRunning(false)
-    Running[self.IsRunning][self.Tag] = nil
+    Running[false] = nil
 end
 local Lerper = {}
 function Lerper.new(Tag, Object)
