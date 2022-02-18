@@ -31,7 +31,7 @@ function Iterator.Cycle(Object, Value)
     local Idx = table.find(Object.Range, Object.End)
     if Idx == #Object.Range then
         if Object.DisableOnCompletion then
-            Object:TurnOn(false)
+            Object:SetRunning(false)
         end
         return Object.Range[1]
     end
