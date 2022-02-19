@@ -1,7 +1,7 @@
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
-local DeepCopy = require(script.Parent:WaitForChild("Table")).DeepCopy
+local Table = require(script.Parent:WaitForChild("Table"))
 local function AccToAlpha(Object)
     return Object.Acc / Object.Time
 end
@@ -28,7 +28,7 @@ function Iterator.Reverse(Object)
     end
     return Object.Range[Idx + Object.EndDirection]
 end
-function Iterator.Cycle(Object, Value)
+function Iterator.Cycle(Object)
     local Idx = table.find(Object.Range, Object.End)
     if Idx == #Object.Range then
         if Object.DisableOnCompletion then
@@ -60,7 +60,7 @@ function Meta:Destroy()
 end
 local Lerper = {}
 function Lerper.new(Tag, Object, Recycle) -- Recycle creates an instance of Object as if Object was a Class
-    local Object = ( Recycle and DeepCopy(Object) ) or Object
+    local Object = ( Recycle and Table.DeepCopy(Object) ) or Object
     Object.Start = Object.Range[1]
     Object.End = Object.Range[2]
     Object.Acc = 0
