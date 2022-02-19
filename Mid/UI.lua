@@ -11,16 +11,11 @@ local Container = Player.PlayerGui
     :WaitForChild("Background")
 local ButtonRatio = 1.15
 local function ResizeLabel(Label, Size)
-    local Button = Label.Button
     local LabelAnim = TweenService:Create(Label, TweenInfo.new(0.3), 
         {Size = UDim2.new(Label.Size.X.Scale * Size, 0, Label.Size.Y.Scale * Size, 0)}
     )
-    local ButtonAnim = TweenService:Create(Label.Button, TweenInfo.new(0.3), 
-        {Size = UDim2.new(0, Button.Size.X.Offset * Size, 0, Button.Size.Y.Offset * Size, 0)}
-    )
     return function()
         LabelAnim:Play()
-        ButtonAnim:Play()
     end
 end
 local UIManager = {}
